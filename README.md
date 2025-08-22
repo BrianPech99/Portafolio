@@ -6,14 +6,11 @@ Listo subame 10
 
 ---
 
-## Bitácora de Clase
+## Tarea #996 Realizar una investigacion sobre RAID.
+Entregarla en MarkDown y subirla a su repositorio de tareas.
 
-### 21 de agosto de 2025
-- **Tema:** Introducción al curso y organización del portafolio.
-- **Actividades:** 
-  - Revisión de objetivos del semestre.
-  - Edición inicial del archivo README.md.
-- **Notas:** Se explicó la importancia de documentar el trabajo realizado.
+YA QUEDO PUEDE REVISARLO
+
 
 ### 22 de agosto de 2025
 - **Tema:** Primeros pasos con Markdown.
