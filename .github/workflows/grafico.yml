@@ -10,37 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Clonar el repositorio
     - uses: actions/checkout@v3
 
-    # 2️⃣ Configurar Python
     - name: Configurar Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
 
-    # 3️⃣ Instalar dependencias
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
         pip install pandas matplotlib elasticsearch numpy
 
-    # 4️⃣ Ejecutar script Python
+    - name: Crear carpeta docs (por si acaso)
+      run: mkdir -p docs
+
     - name: Ejecutar script
       run: python ElasticSearch.py
 
-    # 5️⃣ Configurar Git para push
     - name: Configurar Git
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
 
-    # 6️⃣ Commit y push de gráficos usando token
     - name: Commit y push de gráficos
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
-        git add docs/grafico.png
-        git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
-        git push origin main
+        if [ -f docs/grafico.png ]; then
+          git add docs/grafico.png
+          git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
+          git push origin main
+        else
+          echo "docs/grafico.png no existe — no se realiza commit/push"
+        fi
