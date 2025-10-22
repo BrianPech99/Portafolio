@@ -2,24 +2,19 @@ from elasticsearch import Elasticsearch
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+import time
 
-# Crear carpeta docs si no existe (para GitHub Pages)
-os.makedirs("docs", exist_ok=True)
+# Conectarse a Elasticsearch del runner de GitHub Actions
+es = Elasticsearch("http://localhost:9200")  # HTTP y sin seguridad
 
-# Conectarse a Elasticsearch con HTTPS y autenticación
-es = Elasticsearch(
-    "https://localhost:9200",
-    basic_auth=("elastic", "NttvGEaD_q3qEOR9Szpk"),
-    verify_certs=False  # Permite certificados auto-firmados
-)
+# Esperar un poco para que Elasticsearch esté listo
+time.sleep(10)
 
-# Verificar conexión
 if not es.ping():
-    print("❌ No se pudo conectar a Elasticsearch con HTTPS y credenciales")
+    print("❌ No se pudo conectar a Elasticsearch")
     exit()
 else:
-    print("✅ Conectado a Elasticsearch con HTTPS")
+    print("✅ Conectado a Elasticsearch")
 
 # Nombre del índice
 index_name = "ligamx_2016_2022"
@@ -31,24 +26,20 @@ if not es.indices.exists(index=index_name):
 else:
     print(f"ℹ️ Índice '{index_name}' ya existe")
 
-# Cargar dataset desde la raíz del repositorio
-df = pd.read_csv("data.csv")
-
-# Mostrar columnas para confirmar
-print("Columnas disponibles:", df.columns.tolist())
+# Cargar dataset
+df = pd.read_csv("data.csv")  # data.csv debe estar en la raíz del repositorio
 
 # Reemplazar NaN y valores no compatibles con JSON
 df = df.replace({np.nan: None})
 df = df.astype(object)
 
-# Subir datos a Elasticsearch (si el ID ya existe, actualiza el documento)
+# Subir datos a Elasticsearch
 for i, row in df.iterrows():
     es.index(index=index_name, id=i, document=row.to_dict())
 
-count = es.count(index=index_name)["count"]
-print(f"✅ Se subieron {count} registros a Elasticsearch")
+print(f"✅ Se subieron {len(df)} registros a Elasticsearch")
 
-# Graficar ejemplo: partidos ganados como local vs visitante
+# Graficar
 if "home_win" in df.columns and "away_win" in df.columns:
     home_wins = df["home_win"].sum()
     away_wins = df["away_win"].sum()
@@ -58,8 +49,5 @@ if "home_win" in df.columns and "away_win" in df.columns:
     plt.xlabel("Condición")
     plt.ylabel("Cantidad de partidos")
     plt.tight_layout()
-    plt.savefig("docs/grafico.png")  # Guardar en la carpeta docs
-
-    print("✅ Gráfico guardado como 'docs/grafico.png'")
-else:
-    print("⚠️ Las columnas 'home_win' y 'away_win' no existen en el dataset.")
+    plt.savefig("docs/grafico.png")  # guardar dentro de docs para GitHub Pages
+    print("✅ Gráfico guardado en docs/grafico.png")
