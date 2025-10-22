@@ -49,5 +49,5 @@ if "home_win" in df.columns and "away_win" in df.columns:
     plt.xlabel("Condición")
     plt.ylabel("Cantidad de partidos")
     plt.tight_layout()
-    plt.savefig("docs/grafico.png")  # guardar dentro de docs para GitHub Pages
+    plt.savefig("docs/")  # guardar dentro de docs para GitHub Pages
     print("✅ Gráfico guardado en docs/grafico.png")
