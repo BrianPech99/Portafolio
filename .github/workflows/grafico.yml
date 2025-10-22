@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout del repositorio
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Configurar Python
       uses: actions/setup-python@v4
@@ -21,21 +20,19 @@ jobs:
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
-        pip install pandas matplotlib numpy
+        pip install pandas matplotlib elasticsearch numpy
 
     - name: Ejecutar script
       run: python ElasticSearch.py
 
-    - name: Configurar Git
+    - name: Configurar Git con token
       run: |
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
 
     - name: Commit y push de gráficos
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
         git add docs/grafico.png
         git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
         git push origin main
