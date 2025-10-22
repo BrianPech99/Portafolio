@@ -55,7 +55,7 @@ if "home_win" in df.columns and "away_win" in df.columns:
     plt.xlabel("Condición")
     plt.ylabel("Cantidad de partidos")
     plt.tight_layout()
-    plt.savefig("grafico.png")
+    plt.savefig("docs/grafico.png")
 
     print("✅ Gráfico guardado como 'grafico.png'")
 else:
