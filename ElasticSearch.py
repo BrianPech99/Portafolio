@@ -2,6 +2,10 @@ from elasticsearch import Elasticsearch
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
+# Crear carpeta docs si no existe (para GitHub Pages)
+os.makedirs("docs", exist_ok=True)
 
 # Conectarse a Elasticsearch con HTTPS y autenticación
 es = Elasticsearch(
@@ -27,9 +31,8 @@ if not es.indices.exists(index=index_name):
 else:
     print(f"ℹ️ Índice '{index_name}' ya existe")
 
-# Cargar dataset
+# Cargar dataset desde la raíz del repositorio
 df = pd.read_csv("data.csv")
-
 
 # Mostrar columnas para confirmar
 print("Columnas disponibles:", df.columns.tolist())
@@ -55,8 +58,8 @@ if "home_win" in df.columns and "away_win" in df.columns:
     plt.xlabel("Condición")
     plt.ylabel("Cantidad de partidos")
     plt.tight_layout()
-    plt.savefig("docs/grafico.png")
+    plt.savefig("docs/grafico.png")  # Guardar en la carpeta docs
 
-    print("✅ Gráfico guardado como 'grafico.png'")
+    print("✅ Gráfico guardado como 'docs/grafico.png'")
 else:
     print("⚠️ Las columnas 'home_win' y 'away_win' no existen en el dataset.")
