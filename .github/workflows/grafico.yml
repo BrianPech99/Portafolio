@@ -1,38 +1,40 @@
-name: Generar gráfico
+name: Generate Visualizations and Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Ejecutar semanalmente
+  workflow_dispatch:       # Permitir ejecución manual
 
 jobs:
-  build:
+  generate-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Configurar Python
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'
-
-    - name: Instalar dependencias
+        python-version: '3.9'
+        
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas matplotlib elasticsearch numpy
-
-    - name: Ejecutar script
-      run: python ElasticSearch.py
-
-    - name: Configurar Git con token
+        pip install elasticsearch pandas matplotlib seaborn numpy
+        
+    - name: Run ElasticSearch script
+      env:
+        ELASTIC_CLOUD_ID: ${{ secrets.ELASTIC_CLOUD_ID }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
       run: |
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-
-    - name: Commit y push de gráficos
-      run: |
-        git add docs/grafico.png
-        git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
-        git push origin main
+        python ElasticSearch.py
+      
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
