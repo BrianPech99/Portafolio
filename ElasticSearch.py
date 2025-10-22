@@ -28,7 +28,8 @@ else:
     print(f"ℹ️ Índice '{index_name}' ya existe")
 
 # Cargar dataset
-df = pd.read_csv(r"C:\Users\Brian_ahg9dj5\Portafolio\data.csv")
+df = pd.read_csv("data.csv")
+
 
 # Mostrar columnas para confirmar
 print("Columnas disponibles:", df.columns.tolist())
