@@ -9,35 +9,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:9.1.3
-        ports:
-          - 9200:9200
-        options: >-
-          --env discovery.type=single-node
-          --env xpack.security.enabled=false
-
     steps:
-      - uses: actions/checkout@v3
+    # 1️⃣ Clonar el repositorio
+    - uses: actions/checkout@v3
 
-      - name: Configurar Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
+    # 2️⃣ Configurar Python
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
 
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas matplotlib elasticsearch
+    # 3️⃣ Instalar dependencias
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas matplotlib elasticsearch numpy
 
-      - name: Ejecutar script
-        run: python ElasticSearch.py
+    # 4️⃣ Ejecutar script Python
+    - name: Ejecutar script
+      run: python ElasticSearch.py
 
-      - name: Commit y push de gráficos
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add docs/grafico.png
-          git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
-          git push
+    # 5️⃣ Configurar Git para push
+    - name: Configurar Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    # 6️⃣ Commit y push de gráficos usando token
+    - name: Commit y push de gráficos
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
+        git add docs/grafico.png
+        git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
+        git push origin main
