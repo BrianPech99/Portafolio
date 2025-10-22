@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
 
     - name: Configurar Python
       uses: actions/setup-python@v4
@@ -20,10 +21,7 @@ jobs:
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
-        pip install pandas matplotlib elasticsearch numpy
-
-    - name: Crear carpeta docs (por si acaso)
-      run: mkdir -p docs
+        pip install pandas matplotlib numpy
 
     - name: Ejecutar script
       run: python ElasticSearch.py
@@ -38,10 +36,6 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/BrianPech99/Portafolio.git
-        if [ -f docs/grafico.png ]; then
-          git add docs/grafico.png
-          git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
-          git push origin main
-        else
-          echo "docs/grafico.png no existe — no se realiza commit/push"
-        fi
+        git add docs/grafico.png
+        git commit -m "Actualizar gráfico" || echo "No hay cambios para commitear"
+        git push origin main

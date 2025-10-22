@@ -1,45 +1,21 @@
-from elasticsearch import Elasticsearch
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import time
+import os
 
-# Conectarse a Elasticsearch del runner de GitHub Actions
-es = Elasticsearch("http://localhost:9200")  # HTTP y sin seguridad
+# Asegurarse de que la carpeta 'docs' exista
+os.makedirs("docs", exist_ok=True)
 
-# Esperar un poco para que Elasticsearch esté listo
-time.sleep(10)
+# Cargar dataset desde la raíz del repositorio
+df = pd.read_csv("data.csv")
 
-if not es.ping():
-    print("❌ No se pudo conectar a Elasticsearch")
-    exit()
-else:
-    print("✅ Conectado a Elasticsearch")
+# Mostrar columnas para confirmar
+print("Columnas disponibles:", df.columns.tolist())
 
-# Nombre del índice
-index_name = "ligamx_2016_2022"
-
-# Crear índice si no existe
-if not es.indices.exists(index=index_name):
-    es.indices.create(index=index_name)
-    print(f"✅ Índice '{index_name}' creado")
-else:
-    print(f"ℹ️ Índice '{index_name}' ya existe")
-
-# Cargar dataset
-df = pd.read_csv("data.csv")  # data.csv debe estar en la raíz del repositorio
-
-# Reemplazar NaN y valores no compatibles con JSON
+# Reemplazar NaN con None (opcional, útil si quieres procesar JSON)
 df = df.replace({np.nan: None})
-df = df.astype(object)
 
-# Subir datos a Elasticsearch
-for i, row in df.iterrows():
-    es.index(index=index_name, id=i, document=row.to_dict())
-
-print(f"✅ Se subieron {len(df)} registros a Elasticsearch")
-
-# Graficar
+# Graficar ejemplo: partidos ganados como local vs visitante
 if "home_win" in df.columns and "away_win" in df.columns:
     home_wins = df["home_win"].sum()
     away_wins = df["away_win"].sum()
@@ -49,5 +25,9 @@ if "home_win" in df.columns and "away_win" in df.columns:
     plt.xlabel("Condición")
     plt.ylabel("Cantidad de partidos")
     plt.tight_layout()
-    plt.savefig("docs/")  # guardar dentro de docs para GitHub Pages
-    print("✅ Gráfico guardado en docs/grafico.png")
+
+    # Guardar gráfico en la carpeta docs
+    plt.savefig("docs/grafico.png")
+    print("✅ Gráfico guardado como 'docs/grafico.png'")
+else:
+    print("⚠️ Las columnas 'home_win' y 'away_win' no existen en el dataset.")
